@@ -1,13 +1,12 @@
 import time
 from sync import run_sync
 
-INTERVAL = 180  # 3 perc
-
 while True:
     try:
-        print("Running sync...")
+        print("SYNC START")
         run_sync()
+        print("SYNC DONE")
     except Exception as e:
         print("ERROR:", e)
 
-    time.sleep(INTERVAL)
+    time.sleep(180)
