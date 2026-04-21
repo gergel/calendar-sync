@@ -25,6 +25,8 @@ def extract_dates(event):
 def create_event(event):
     start, end = extract_dates(event)
 
+    print("CREATING:", event.get("summary"))
+
     notion.pages.create(
         parent={"database_id": DB_ID},
         properties={
@@ -46,12 +48,3 @@ def create_event(event):
             },
         },
     )
-
-
-def archive_event(event_id):
-    # egyszerű fallback: nem keresünk vissza
-    print(f"Event deleted in Google (ignored in Notion): {event_id}")
-
-
-def update_event(page_id, event):
-    pass  # nem használjuk
