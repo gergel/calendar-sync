@@ -25,17 +25,18 @@ def get_events(sync_token=None):
 
     url = f"https://www.googleapis.com/calendar/v3/calendars/{os.getenv('GOOGLE_CALENDAR_ID')}/events"
 
-    params = {
-        "maxResults": 250,
-        "showDeleted": True,
-        "singleEvents": False,
-    }
-
+    # 🔥 KULCS LOGIKA
     if sync_token:
-        params["syncToken"] = sync_token
+        params = {
+            "syncToken": sync_token
+        }
     else:
-        params["timeMin"] = "2026-03-01T00:00:00Z"
-        params["orderBy"] = "updated"
+        params = {
+            "maxResults": 250,
+            "showDeleted": True,
+            "singleEvents": False,
+            "timeMin": "2026-03-01T00:00:00Z"
+        }
 
     res = requests.get(
         url,
@@ -45,7 +46,7 @@ def get_events(sync_token=None):
 
     data = res.json()
 
-    print("GOOGLE RESPONSE COUNT:", len(data.get("items", [])))
+    print("GOOGLE RESPONSE:", data)
 
     if not res.ok:
         print("GOOGLE ERROR:", res.text)
