@@ -1,12 +1,15 @@
 import json
 import os
 
-STATE_FILE = "/data/sync_state.json"
+STATE_FILE = "/data/state.json"
 
 
 def load_state():
     if not os.path.exists(STATE_FILE):
-        return {}
+        return {
+            "sync_token": None,
+            "imported_ids": []
+        }
 
     with open(STATE_FILE, "r") as f:
         return json.load(f)
