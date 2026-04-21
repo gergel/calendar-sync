@@ -1,6 +1,7 @@
 import requests
 import os
 
+
 def refresh_token():
     res = requests.post(
         "https://oauth2.googleapis.com/token",
@@ -12,10 +13,15 @@ def refresh_token():
         },
     )
 
-    print("GOOGLE TOKEN RESPONSE:", res.text)  # 👈 EZ KELL
-    
-    res.raise_for_status()
-    return res.json()["access_token"]
+    if not res.ok:
+        print("TOKEN ERROR:", res.text)
+        res.raise_for_status()
+
+    data = res.json()
+    print("GOOGLE TOKEN RESPONSE:", data)
+
+    return data["access_token"]
+
 
 def get_events(sync_token=None):
     access_token = refresh_token()
@@ -32,6 +38,7 @@ def get_events(sync_token=None):
         params["syncToken"] = sync_token
     else:
         params["timeMin"] = "2026-03-01T00:00:00Z"
+        params["orderBy"] = "updated"
 
     res = requests.get(
         url,
@@ -39,5 +46,12 @@ def get_events(sync_token=None):
         params=params,
     )
 
-    res.raise_for_status()
-    return res.json()
+    data = res.json()
+
+    print("GOOGLE RESPONSE:", data)
+
+    if not res.ok:
+        print("GOOGLE ERROR:", res.text)
+        res.raise_for_status()
+
+    return data
