@@ -11,6 +11,9 @@ def refresh_token():
             "grant_type": "refresh_token",
         },
     )
+
+    print("GOOGLE TOKEN RESPONSE:", res.text)  # 👈 EZ KELL
+    
     res.raise_for_status()
     return res.json()["access_token"]
 
