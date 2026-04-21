@@ -38,27 +38,67 @@ def build_index():
     return index
 
 
+def extract_dates(event):
+    start = None
+    end = None
+
+    # Google dateTime
+    if event.get("start", {}).get("dateTime"):
+        start = event["start"]["dateTime"]
+    elif event.get("start", {}).get("date"):
+        start = event["start"]["date"] + "T00:00:00"
+
+    if event.get("end", {}).get("dateTime"):
+        end = event["end"]["dateTime"]
+    elif event.get("end", {}).get("date"):
+        end = event["end"]["date"] + "T00:00:00"
+
+    return start, end
+
+
 def create_event(event):
+    start, end = extract_dates(event)
+
     notion.pages.create(
         parent={"database_id": DB_ID},
         properties={
             "Name": {
-                "title": [{"text": {"content": event.get("summary", "No title")}}]
+                "title": [
+                    {"text": {"content": event.get("summary", "No title")}}
+                ]
+            },
+            "Date": {
+                "date": {
+                    "start": start,
+                    "end": end
+                }
             },
             "external_id": {
-                "rich_text": [{"text": {"content": event["id"]}}]
+                "rich_text": [
+                    {"text": {"content": event["id"]}}
+                ]
             },
         },
     )
 
 
 def update_event(page_id, event):
+    start, end = extract_dates(event)
+
     notion.pages.update(
         page_id=page_id,
         properties={
             "Name": {
-                "title": [{"text": {"content": event.get("summary", "No title")}}]
-            }
+                "title": [
+                    {"text": {"content": event.get("summary", "No title")}}
+                ]
+            },
+            "Date": {
+                "date": {
+                    "start": start,
+                    "end": end
+                }
+            },
         },
     )
 
