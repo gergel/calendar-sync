@@ -1,21 +1,6 @@
-from google import get_events
-from notion import upsert_event, delete_event, get_existing_ids
-import json
-import os
-
-STATE_FILE = "sync_state.json"
-
-
-def load_state():
-    if not os.path.exists(STATE_FILE):
-        return {}
-    with open(STATE_FILE, "r") as f:
-        return json.load(f)
-
-
-def save_state(state):
-    with open(STATE_FILE, "w") as f:
-        json.dump(state, f)
+from google_api import get_events
+from notion_api import create_event, update_event, archive_event, build_index
+from state import load_state, save_state
 
 
 def run_sync():
@@ -24,19 +9,25 @@ def run_sync():
 
     data = get_events(sync_token)
 
-    events = data["items"]
+    events = data.get("items", [])
     next_sync_token = data.get("nextSyncToken")
 
-    existing_ids = get_existing_ids()
+    notion_index = build_index()
 
     for e in events:
         event_id = e["id"]
 
+        # törlés
         if e.get("status") == "cancelled":
-            delete_event(event_id)
+            if event_id in notion_index:
+                archive_event(notion_index[event_id])
             continue
 
-        upsert_event(e, existing_ids)
+        # update
+        if event_id in notion_index:
+            update_event(notion_index[event_id], e)
+        else:
+            create_event(e)
 
     if next_sync_token:
         state["sync_token"] = next_sync_token
