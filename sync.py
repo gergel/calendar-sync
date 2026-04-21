@@ -14,9 +14,9 @@ def run_sync():
     print("SYNC TOKEN:", sync_token)
     print("KNOWN IDS:", len(imported_ids))
 
-    # 🔥 FIRST RUN → FULL IMPORT
+    # 🔥 FIRST RUN → CSAK BASELINE
     if run_count == 0:
-        print("FIRST RUN → importing ALL events")
+        print("FIRST RUN → ONLY SAVING BASELINE (NO NOTION WRITE)")
 
         data = get_events(None)
         events = data.get("items", [])
@@ -26,7 +26,6 @@ def run_sync():
             if e.get("status") == "cancelled":
                 continue
 
-            create_event(e)
             imported_ids.add(e["id"])
 
         if next_sync_token:
@@ -37,7 +36,7 @@ def run_sync():
 
         save_state(state)
 
-        print("FIRST RUN DONE")
+        print(f"Baseline saved with {len(imported_ids)} events")
         return
 
     # 🔥 NORMAL RUN
