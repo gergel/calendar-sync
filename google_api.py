@@ -17,10 +17,7 @@ def refresh_token():
         print("TOKEN ERROR:", res.text)
         res.raise_for_status()
 
-    data = res.json()
-    print("GOOGLE TOKEN RESPONSE:", data)
-
-    return data["access_token"]
+    return res.json()["access_token"]
 
 
 def get_events(sync_token=None):
@@ -48,7 +45,7 @@ def get_events(sync_token=None):
 
     data = res.json()
 
-    print("GOOGLE RESPONSE:", data)
+    print("GOOGLE RESPONSE COUNT:", len(data.get("items", [])))
 
     if not res.ok:
         print("GOOGLE ERROR:", res.text)
